@@ -4,13 +4,13 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 export class UpstashQStash implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash QStash',
 		name: 'upstashQStash',
-		icon: 'file:upstash.svg',
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
@@ -19,8 +19,8 @@ export class UpstashQStash implements INodeType {
 		defaults: {
 			name: 'Upstash QStash',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'upstashQStashApi',

@@ -4,13 +4,13 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 export class UpstashRedis implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash Redis',
 		name: 'upstashRedis',
-		icon: 'file:upstash.svg',
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
@@ -19,8 +19,8 @@ export class UpstashRedis implements INodeType {
 		defaults: {
 			name: 'Upstash Redis',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'upstashRedisApi',
@@ -62,13 +62,13 @@ export class UpstashRedis implements INodeType {
 						name: 'JSON Get',
 						value: 'jsonGet',
 						description: 'Get JSON value from key at specified JSON path',
-						action: 'JSON get value',
+						action: 'Get a JSON value',
 					},
 					{
 						name: 'JSON Set',
 						value: 'jsonSet',
 						description: 'Set JSON value into key at specified JSON path',
-						action: 'JSON set value',
+						action: 'Set a JSON value',
 					},
 					{
 						name: 'Set Value',

@@ -4,6 +4,7 @@ import type {
 	ISupplyDataFunctions,
 	SupplyData,
 } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 
 interface UpstashVectorQueryResult {
 	id: string;
@@ -17,7 +18,7 @@ export class UpstashVectorStore implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash Vector Store',
 		name: 'upstashVectorStore',
-		icon: 'file:upstash.svg',
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["embeddingMode"]}}',
@@ -34,7 +35,7 @@ export class UpstashVectorStore implements INodeType {
 		],
 		inputs: `={{ [
 			{
-				type: "ai_embedding",
+				type: "${NodeConnectionTypes.AiEmbedding}",
 				name: "embedding",
 				displayName: "Embedding Model",
 				required: false,
@@ -43,7 +44,7 @@ export class UpstashVectorStore implements INodeType {
 		] }}`,
 		outputs: `={{ [
 			{
-				type: "ai_vectorStore",
+				type: "${NodeConnectionTypes.AiVectorStore}",
 				name: "vectorStore",
 				displayName: "Vector Store"
 			}
@@ -68,7 +69,7 @@ export class UpstashVectorStore implements INodeType {
 						description: 'Uses the connected n8n Embeddings model (e.g. OpenAI, Cohere)',
 					},
 					{
-						name: 'Upstash Built-in Embedding (Server-side)',
+						name: 'Upstash Built-In Embedding (Server-Side)',
 						value: 'upstashAuto',
 						description: 'Uses Upstash auto-embedding configured in your Upstash index (No separate embedding key needed)',
 					},
@@ -103,7 +104,7 @@ export class UpstashVectorStore implements INodeType {
 		const topK = this.getNodeParameter('topK', itemIndex, 4) as number;
 		const filter = this.getNodeParameter('filter', itemIndex, '') as string;
 
-		const embeddings = (await this.getInputConnectionData('ai_embedding' as any, 0)) as any;
+		const embeddings = (await this.getInputConnectionData(NodeConnectionTypes.AiEmbedding, 0)) as any;
 
 		const nodeContext = this;
 

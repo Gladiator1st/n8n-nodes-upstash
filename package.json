@@ -1,6 +1,6 @@
 {
   "name": "@gladiator1st/n8n-nodes-upstash",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "n8n community node suite for Upstash Serverless Vector (RAG), Redis Caching & QStash Scheduler",
   "author": {
     "name": "Muhammad Qasim",
