@@ -1,6 +1,6 @@
 {
   "name": "@gladiator1st/n8n-nodes-upstash",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "n8n community node suite for Upstash Serverless Vector (RAG), Redis Caching & QStash Scheduler",
   "keywords": [
     "n8n-community-node-package",
@@ -15,10 +15,10 @@
     "serverless"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/MuhammadQasim/n8n-nodes-upstash#readme",
+  "homepage": "https://github.com/Gladiator1st/n8n-nodes-upstash#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MuhammadQasim/n8n-nodes-upstash.git"
+    "url": "https://github.com/Gladiator1st/n8n-nodes-upstash.git"
   },
   "main": "index.js",
   "scripts": {
