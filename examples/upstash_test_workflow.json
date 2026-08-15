@@ -1,0 +1,190 @@
+{
+  "name": "Upstash Full Test Suite (Vector, Redis & QStash)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-manual",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "vector",
+        "operation": "upsert",
+        "vectorId": "doc_company_policy_01",
+        "inputType": "text",
+        "textData": "All customers are entitled to a 100% full refund within 30 days of purchase without questions asked.",
+        "metadataJson": "{\n  \"category\": \"policies\",\n  \"topic\": \"refunds\"\n}"
+      },
+      "id": "upstash-vector-upsert",
+      "name": "1. Upstash Vector - Upsert Knowledge",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstashVector",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "vector",
+        "operation": "query",
+        "queryType": "text",
+        "queryText": "What is the policy for getting money back on purchases?",
+        "topK": 3,
+        "includeData": true
+      },
+      "id": "upstash-vector-query",
+      "name": "2. Upstash Vector - Semantic Similarity Query",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstashVector",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "user_session:1001",
+        "value": "{\"name\": \"Qasim\", \"role\": \"SuperAdmin\", \"status\": \"active\"}",
+        "ttlSeconds": 300
+      },
+      "id": "upstash-redis-set",
+      "name": "3. Upstash Redis - Set Key & TTL",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstashRedis",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "user_session:1001"
+      },
+      "id": "upstash-redis-get",
+      "name": "4. Upstash Redis - Get Key",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstashRedis",
+      "typeVersion": 1,
+      "position": [
+        700,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "rateLimit",
+        "identifier": "user_qasim_123",
+        "maxRequests": 5,
+        "windowSeconds": 60
+      },
+      "id": "upstash-redis-ratelimit",
+      "name": "5. Upstash Redis - AI Rate Limiter",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstashRedis",
+      "typeVersion": 1,
+      "position": [
+        950,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "publish",
+        "destinationUrl": "https://webhook.site/test-callback",
+        "body": "{\n  \"message\": \"Triggering delayed notification from n8n!\",\n  \"timestamp\": 1700000000\n}",
+        "delay": "10s",
+        "retries": 3
+      },
+      "id": "upstash-qstash-publish",
+      "name": "6. Upstash QStash - Delayed Webhook (10s)",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstashQStash",
+      "typeVersion": 1,
+      "position": [
+        450,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🧪 Upstash Community Node Verification Suite\n\nThis test workflow demonstrates the complete superpower suite of **`@gladiator1st/n8n-nodes-upstash`**:\n\n1. **Row 1:** Vector Database (Auto-Embedding Upsert & Semantic Similarity Query)\n2. **Row 2:** Serverless Redis (Key-Value Storage, TTL Caching & AI Rate-Limiter)\n3. **Row 3:** QStash Message Queue (Delayed Webhook Scheduling)",
+        "height": 180,
+        "width": 950,
+        "color": 4
+      },
+      "id": "note-header",
+      "name": "Sticky Note - Header",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        200,
+        60
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "1. Upstash Vector - Upsert Knowledge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "3. Upstash Redis - Set Key & TTL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "6. Upstash QStash - Delayed Webhook (10s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Upstash Vector - Upsert Knowledge": {
+      "main": [
+        [
+          {
+            "node": "2. Upstash Vector - Semantic Similarity Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Upstash Redis - Set Key & TTL": {
+      "main": [
+        [
+          {
+            "node": "4. Upstash Redis - Get Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Upstash Redis - Get Key": {
+      "main": [
+        [
+          {
+            "node": "5. Upstash Redis - AI Rate Limiter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
