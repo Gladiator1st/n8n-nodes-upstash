@@ -1,7 +1,7 @@
-# n8n-nodes-upstash
+# @gladiator1st/n8n-nodes-upstash
 
 ![n8n Community Node](https://img.shields.io/badge/n8n-community--node-orange?style=flat-square)
-![npm version](https://img.shields.io/npm/v/n8n-nodes-upstash?style=flat-square&color=00e599)
+![npm version](https://img.shields.io/npm/v/@gladiator1st/n8n-nodes-upstash?style=flat-square&color=00e599)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
 An all-in-one **n8n Community Node Suite** for **Upstash Serverless Data & AI** — providing native **Vector Search (RAG) for AI Agents**, **Redis Caching & AI Rate-Limiting**, and **QStash Delayed Webhook Scheduling**.
@@ -11,16 +11,16 @@ An all-in-one **n8n Community Node Suite** for **Upstash Serverless Data & AI** 
 ## ⚡ Superpowers Included
 
 ```
-                        ┌──────────────────────────────────────────────┐
-                        │              n8n-nodes-upstash               │
-                        └──────────────────────┬───────────────────────┘
-                                               │
-       ┌───────────────────────────────┼───────────────────────────────┐
-       ▼                               ▼                               ▼
-🧠 Upstash Vector Store         💾 Upstash Redis                ⏰ Upstash QStash
-• LangChain RAG for AI Agents   • Key-Value & JSON Storage      • Delayed Webhook Scheduler
-• Server-Side Auto-Embedding    • Sliding-Window Rate Limiter   • Reliable Retries & Cron
-• Metadata Filtering            • AI Agent Cost Saver           • Deduplication & Queues
+                     ┌─────────────────────────────────────────────────────┐
+                     │          @gladiator1st/n8n-nodes-upstash            │
+                     └──────────────────────────┬──────────────────────────┘
+                                                │
+       ┌────────────────────────────────┼────────────────────────────────┐
+       ▼                                ▼                                ▼
+🧠 Upstash Vector Store          💾 Upstash Redis                 ⏰ Upstash QStash
+• LangChain RAG for AI Agents    • Key-Value & JSON Storage       • Delayed Webhook Scheduler
+• Server-Side Auto-Embedding     • Sliding-Window Rate Limiter    • Reliable Retries & Cron
+• Metadata Filtering             • AI Agent Cost Saver            • Deduplication & Queues
 ```
 
 ---
@@ -61,7 +61,7 @@ Serverless HTTP message scheduler and queues:
 2. Click **Install a community node**.
 3. Enter:
    ```text
-   n8n-nodes-upstash
+   @gladiator1st/n8n-nodes-upstash
    ```
 4. Check the terms confirmation and click **Install**.
 
