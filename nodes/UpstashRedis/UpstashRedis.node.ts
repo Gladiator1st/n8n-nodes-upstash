@@ -4,7 +4,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 
 export class UpstashRedis implements INodeType {
 	description: INodeTypeDescription = {
@@ -19,8 +19,8 @@ export class UpstashRedis implements INodeType {
 		defaults: {
 			name: 'Upstash Redis',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'],
+		outputs: ['main'],
 		credentials: [
 			{
 				name: 'upstashRedisApi',

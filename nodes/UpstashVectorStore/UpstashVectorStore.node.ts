@@ -4,7 +4,6 @@ import type {
 	ISupplyDataFunctions,
 	SupplyData,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
 
 interface UpstashVectorQueryResult {
 	id: string;
@@ -35,7 +34,7 @@ export class UpstashVectorStore implements INodeType {
 		],
 		inputs: `={{ [
 			{
-				type: "${NodeConnectionType.AiEmbedding}",
+				type: "ai_embedding",
 				name: "embedding",
 				displayName: "Embedding Model",
 				required: false,
@@ -44,7 +43,7 @@ export class UpstashVectorStore implements INodeType {
 		] }}`,
 		outputs: `={{ [
 			{
-				type: "${NodeConnectionType.AiVectorStore}",
+				type: "ai_vectorStore",
 				name: "vectorStore",
 				displayName: "Vector Store"
 			}
@@ -104,7 +103,7 @@ export class UpstashVectorStore implements INodeType {
 		const topK = this.getNodeParameter('topK', itemIndex, 4) as number;
 		const filter = this.getNodeParameter('filter', itemIndex, '') as string;
 
-		const embeddings = (await this.getInputConnectionData(NodeConnectionType.AiEmbedding, 0)) as any;
+		const embeddings = (await this.getInputConnectionData('ai_embedding' as any, 0)) as any;
 
 		const nodeContext = this;
 
