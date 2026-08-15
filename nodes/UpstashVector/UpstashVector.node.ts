@@ -323,12 +323,6 @@ export class UpstashVector implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 		const credentials = await this.getCredentials('upstashVectorApi');
 		const baseUrl = (credentials.url as string).replace(/\/+$/, '');
-		const token = credentials.token as string;
-
-		const headers = {
-			Authorization: `Bearer ${token}`,
-			'Content-Type': 'application/json',
-		};
 
 		for (let i = 0; i < items.length; i++) {
 			try {
@@ -368,13 +362,16 @@ export class UpstashVector implements INodeType {
 
 						if (namespace) endpoint += `?namespace=${encodeURIComponent(namespace)}`;
 
-						const response = await this.helpers.httpRequest({
-							url: endpoint,
-							method: 'POST',
-							headers,
-							body: payload,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'upstashVectorApi',
+							{
+								url: endpoint,
+								method: 'POST',
+								body: payload,
+								json: true,
+							},
+						);
 
 						returnData.push({ json: { success: true, result: response.result || response } });
 					} else if (operation === 'query') {
@@ -402,13 +399,16 @@ export class UpstashVector implements INodeType {
 							endpoint = `${baseUrl}/query`;
 						}
 
-						const response = await this.helpers.httpRequest({
-							url: endpoint,
-							method: 'POST',
-							headers,
-							body: queryPayload,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'upstashVectorApi',
+							{
+								url: endpoint,
+								method: 'POST',
+								body: queryPayload,
+								json: true,
+							},
+						);
 
 						const results = (response.result || response) as any[];
 						for (const res of results) {
@@ -421,12 +421,15 @@ export class UpstashVector implements INodeType {
 						let endpoint = `${baseUrl}/fetch?ids=${encodeURIComponent(ids.join(','))}`;
 						if (namespace) endpoint += `&namespace=${encodeURIComponent(namespace)}`;
 
-						const response = await this.helpers.httpRequest({
-							url: endpoint,
-							method: 'GET',
-							headers,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'upstashVectorApi',
+							{
+								url: endpoint,
+								method: 'GET',
+								json: true,
+							},
+						);
 
 						const results = (response.result || response) as any[];
 						for (const res of results) {
@@ -439,35 +442,44 @@ export class UpstashVector implements INodeType {
 						let endpoint = `${baseUrl}/delete`;
 						if (namespace) endpoint += `?namespace=${encodeURIComponent(namespace)}`;
 
-						const response = await this.helpers.httpRequest({
-							url: endpoint,
-							method: 'DELETE',
-							headers,
-							body: { ids },
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'upstashVectorApi',
+							{
+								url: endpoint,
+								method: 'DELETE',
+								body: { ids },
+								json: true,
+							},
+						);
 
 						returnData.push({ json: { success: true, result: response.result || response } });
 					}
 				} else if (resource === 'index') {
 					if (operation === 'info') {
-						const response = await this.helpers.httpRequest({
-							url: `${baseUrl}/info`,
-							method: 'GET',
-							headers,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'upstashVectorApi',
+							{
+								url: `${baseUrl}/info`,
+								method: 'GET',
+								json: true,
+							},
+						);
 						returnData.push({ json: response.result || response });
 					} else if (operation === 'reset') {
 						let endpoint = `${baseUrl}/reset`;
 						if (namespace) endpoint += `?namespace=${encodeURIComponent(namespace)}`;
 
-						const response = await this.helpers.httpRequest({
-							url: endpoint,
-							method: 'DELETE',
-							headers,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'upstashVectorApi',
+							{
+								url: endpoint,
+								method: 'DELETE',
+								json: true,
+							},
+						);
 						returnData.push({ json: { success: true, result: response.result || response } });
 					}
 				}

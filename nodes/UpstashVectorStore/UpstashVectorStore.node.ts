@@ -95,7 +95,6 @@ export class UpstashVectorStore implements INodeType {
 	async supplyData(this: ISupplyDataFunctions, itemIndex: number): Promise<SupplyData> {
 		const credentials = await this.getCredentials('upstashVectorApi');
 		const baseUrl = (credentials.url as string).replace(/\/+$/, '');
-		const token = credentials.token as string;
 
 		const namespace = this.getNodeParameter('namespace', itemIndex, '') as string;
 		const embeddingMode = this.getNodeParameter('embeddingMode', itemIndex, 'upstashAuto') as string;
@@ -128,16 +127,16 @@ export class UpstashVectorStore implements INodeType {
 					requestBody.data = query;
 				}
 
-				const response = await nodeContext.helpers.httpRequest({
-					url: endpoint,
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${token}`,
-						'Content-Type': 'application/json',
+				const response = await nodeContext.helpers.httpRequestWithAuthentication.call(
+					nodeContext,
+					'upstashVectorApi',
+					{
+						url: endpoint,
+						method: 'POST',
+						body: requestBody,
+						json: true,
 					},
-					body: requestBody,
-					json: true,
-				});
+				);
 
 				const results = (response.result || response) as UpstashVectorQueryResult[];
 				return (results || []).map((r) => ({
@@ -183,16 +182,16 @@ export class UpstashVectorStore implements INodeType {
 						endpoint += `?namespace=${encodeURIComponent(namespace)}`;
 					}
 
-					await nodeContext.helpers.httpRequest({
-						url: endpoint,
-						method: 'POST',
-						headers: {
-							Authorization: `Bearer ${token}`,
-							'Content-Type': 'application/json',
+					await nodeContext.helpers.httpRequestWithAuthentication.call(
+						nodeContext,
+						'upstashVectorApi',
+						{
+							url: endpoint,
+							method: 'POST',
+							body: item,
+							json: true,
 						},
-						body: item,
-						json: true,
-					});
+					);
 				}
 
 				return ids;

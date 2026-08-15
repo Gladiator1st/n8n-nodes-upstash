@@ -206,12 +206,6 @@ export class UpstashRedis implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 		const credentials = await this.getCredentials('upstashRedisApi');
 		const baseUrl = (credentials.url as string).replace(/\/+$/, '');
-		const token = credentials.token as string;
-
-		const headers = {
-			Authorization: `Bearer ${token}`,
-			'Content-Type': 'application/json',
-		};
 
 		for (let i = 0; i < items.length; i++) {
 			try {
@@ -219,12 +213,15 @@ export class UpstashRedis implements INodeType {
 
 				if (operation === 'get') {
 					const key = this.getNodeParameter('key', i) as string;
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/get/${encodeURIComponent(key)}`,
-						method: 'GET',
-						headers,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}/get/${encodeURIComponent(key)}`,
+							method: 'GET',
+							json: true,
+						},
+					);
 
 					let parsedValue = response.result;
 					try {
@@ -244,23 +241,29 @@ export class UpstashRedis implements INodeType {
 						command.push('EX', ttlSeconds.toString());
 					}
 
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}`,
-						method: 'POST',
-						headers,
-						body: command,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}`,
+							method: 'POST',
+							body: command,
+							json: true,
+						},
+					);
 
 					returnData.push({ json: { success: response.result === 'OK', result: response.result } });
 				} else if (operation === 'delete') {
 					const key = this.getNodeParameter('key', i) as string;
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/del/${encodeURIComponent(key)}`,
-						method: 'GET',
-						headers,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}/del/${encodeURIComponent(key)}`,
+							method: 'GET',
+							json: true,
+						},
+					);
 
 					returnData.push({ json: { deletedCount: response.result || 0 } });
 				} else if (operation === 'incr') {
@@ -268,26 +271,32 @@ export class UpstashRedis implements INodeType {
 					const amount = this.getNodeParameter('incrementAmount', i, 1) as number;
 
 					let cmd = ['INCRBY', key, amount.toString()];
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}`,
-						method: 'POST',
-						headers,
-						body: cmd,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}`,
+							method: 'POST',
+							body: cmd,
+							json: true,
+						},
+					);
 
 					returnData.push({ json: { key, newValue: response.result } });
 				} else if (operation === 'jsonGet') {
 					const key = this.getNodeParameter('key', i) as string;
 					const jsonPath = this.getNodeParameter('jsonPath', i, '$') as string;
 
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}`,
-						method: 'POST',
-						headers,
-						body: ['JSON.GET', key, jsonPath],
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}`,
+							method: 'POST',
+							body: ['JSON.GET', key, jsonPath],
+							json: true,
+						},
+					);
 
 					let parsed = response.result;
 					try {
@@ -302,13 +311,16 @@ export class UpstashRedis implements INodeType {
 
 					const jsonString = typeof jsonRaw === 'string' ? jsonRaw : JSON.stringify(jsonRaw);
 
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}`,
-						method: 'POST',
-						headers,
-						body: ['JSON.SET', key, jsonPath, jsonString],
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}`,
+							method: 'POST',
+							body: ['JSON.SET', key, jsonPath, jsonString],
+							json: true,
+						},
+					);
 
 					returnData.push({ json: { success: response.result === 'OK', result: response.result } });
 				} else if (operation === 'rateLimit') {
@@ -328,13 +340,16 @@ export class UpstashRedis implements INodeType {
 						['EXPIRE', rateKey, windowSeconds.toString()],
 					];
 
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/pipeline`,
-						method: 'POST',
-						headers,
-						body: pipeline,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashRedisApi',
+						{
+							url: `${baseUrl}/pipeline`,
+							method: 'POST',
+							body: pipeline,
+							json: true,
+						},
+					);
 
 					const currentCount = (response[1] && response[1].result) || 0;
 					const allowed = currentCount < maxRequests;

@@ -185,8 +185,6 @@ export class UpstashQStash implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
-		const credentials = await this.getCredentials('upstashQStashApi');
-		const token = credentials.token as string;
 		const baseUrl = 'https://qstash.upstash.io/v2';
 
 		for (let i = 0; i < items.length; i++) {
@@ -201,7 +199,6 @@ export class UpstashQStash implements INodeType {
 					const deduplicationId = this.getNodeParameter('deduplicationId', i, '') as string;
 
 					const headers: Record<string, string> = {
-						Authorization: `Bearer ${token}`,
 						'Content-Type': 'application/json',
 						'Upstash-Retries': retries.toString(),
 					};
@@ -209,13 +206,17 @@ export class UpstashQStash implements INodeType {
 					if (delay) headers['Upstash-Delay'] = delay;
 					if (deduplicationId) headers['Upstash-Deduplication-Id'] = deduplicationId;
 
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/publish/${destinationUrl}`,
-						method: 'POST',
-						headers,
-						body,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashQStashApi',
+						{
+							url: `${baseUrl}/publish/${destinationUrl}`,
+							method: 'POST',
+							headers,
+							body,
+							json: true,
+						},
+					);
 
 					returnData.push({ json: response });
 				} else if (operation === 'createSchedule') {
@@ -225,30 +226,34 @@ export class UpstashQStash implements INodeType {
 					const retries = this.getNodeParameter('retries', i, 3) as number;
 
 					const headers: Record<string, string> = {
-						Authorization: `Bearer ${token}`,
 						'Content-Type': 'application/json',
 						'Upstash-Cron': cron,
 						'Upstash-Retries': retries.toString(),
 					};
 
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/schedules/${destinationUrl}`,
-						method: 'POST',
-						headers,
-						body,
-						json: true,
-					});
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashQStashApi',
+						{
+							url: `${baseUrl}/schedules/${destinationUrl}`,
+							method: 'POST',
+							headers,
+							body,
+							json: true,
+						},
+					);
 
 					returnData.push({ json: response });
 				} else if (operation === 'listSchedules') {
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/schedules`,
-						method: 'GET',
-						headers: {
-							Authorization: `Bearer ${token}`,
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashQStashApi',
+						{
+							url: `${baseUrl}/schedules`,
+							method: 'GET',
+							json: true,
 						},
-						json: true,
-					});
+					);
 
 					const list = Array.isArray(response) ? response : [response];
 					for (const item of list) {
@@ -256,26 +261,28 @@ export class UpstashQStash implements INodeType {
 					}
 				} else if (operation === 'deleteSchedule') {
 					const scheduleId = this.getNodeParameter('scheduleId', i) as string;
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/schedules/${encodeURIComponent(scheduleId)}`,
-						method: 'DELETE',
-						headers: {
-							Authorization: `Bearer ${token}`,
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashQStashApi',
+						{
+							url: `${baseUrl}/schedules/${encodeURIComponent(scheduleId)}`,
+							method: 'DELETE',
+							json: true,
 						},
-						json: true,
-					});
+					);
 
 					returnData.push({ json: { success: true, scheduleId, result: response } });
 				} else if (operation === 'cancelMessage') {
 					const messageId = this.getNodeParameter('messageId', i) as string;
-					const response = await this.helpers.httpRequest({
-						url: `${baseUrl}/messages/${encodeURIComponent(messageId)}`,
-						method: 'DELETE',
-						headers: {
-							Authorization: `Bearer ${token}`,
+					const response = await this.helpers.httpRequestWithAuthentication.call(
+						this,
+						'upstashQStashApi',
+						{
+							url: `${baseUrl}/messages/${encodeURIComponent(messageId)}`,
+							method: 'DELETE',
+							json: true,
 						},
-						json: true,
-					});
+					);
 
 					returnData.push({ json: { success: true, messageId, result: response } });
 				}
