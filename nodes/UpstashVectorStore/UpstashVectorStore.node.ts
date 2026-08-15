@@ -18,7 +18,7 @@ export class UpstashVectorStore implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash Vector Store',
 		name: 'upstashVectorStore',
-		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["embeddingMode"]}}',

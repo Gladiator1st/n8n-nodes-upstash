@@ -10,7 +10,7 @@ export class UpstashRedis implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash Redis',
 		name: 'upstashRedis',
-		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',

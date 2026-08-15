@@ -10,7 +10,7 @@ export class UpstashQStash implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash QStash',
 		name: 'upstashQStash',
-		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',

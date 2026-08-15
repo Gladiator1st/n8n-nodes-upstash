@@ -10,7 +10,7 @@ export class UpstashVector implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Upstash Vector',
 		name: 'upstashVector',
-		icon: { light: 'file:upstash.svg', dark: 'file:upstash.svg' },
+		icon: { light: 'file:upstash.svg', dark: 'file:upstash.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
