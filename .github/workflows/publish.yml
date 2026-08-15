@@ -1,6 +1,8 @@
 name: Publish n8n Community Node
 
 on:
+  push:
+    branches: [main]
   release:
     types: [created]
   workflow_dispatch:
@@ -20,8 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          registry-url: 'https://registry.npmjs.org'
-          scope: '@gladiator1st'
+          registry-url: 'https://registry.npmjs.org/'
 
       - name: Install dependencies
         run: npm install
