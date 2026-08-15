@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
-          registry-url: 'https://registry.npmjs.org/'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm install --ignore-scripts
@@ -30,7 +30,9 @@ jobs:
       - name: Build TypeScript & Assets
         run: npm run build
 
-      - name: Publish to npm with Provenance
-        run: npm publish --provenance --access public
+      - name: Authenticate and Publish with Provenance
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
