@@ -4,7 +4,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 export class UpstashRedis implements INodeType {
 	description: INodeTypeDescription = {
@@ -15,11 +15,12 @@ export class UpstashRedis implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
 		description: 'Serverless Redis Key-Value storage, JSON operations, and AI Agent Rate-Limiting over REST',
+		usableAsTool: true,
 		defaults: {
 			name: 'Upstash Redis',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
 				name: 'upstashRedisApi',
@@ -34,22 +35,22 @@ export class UpstashRedis implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Get Value',
-						value: 'get',
-						description: 'Get the string or JSON value of a key',
-						action: 'Get value by key',
-					},
-					{
-						name: 'Set Value',
-						value: 'set',
-						description: 'Set string or JSON value of a key with optional TTL',
-						action: 'Set value of a key',
+						name: 'AI Agent Rate Limiter',
+						value: 'rateLimit',
+						description: 'Sliding window rate-limiter to protect AI agent quotas and prevent loops',
+						action: 'Rate limit requests',
 					},
 					{
 						name: 'Delete Key(s)',
 						value: 'delete',
 						description: 'Delete one or more keys',
 						action: 'Delete keys',
+					},
+					{
+						name: 'Get Value',
+						value: 'get',
+						description: 'Get the string or JSON value of a key',
+						action: 'Get value by key',
 					},
 					{
 						name: 'Increment Counter',
@@ -70,10 +71,10 @@ export class UpstashRedis implements INodeType {
 						action: 'JSON set value',
 					},
 					{
-						name: 'AI Agent Rate Limiter',
-						value: 'rateLimit',
-						description: 'Sliding window rate-limiter to protect AI agent quotas and prevent loops',
-						action: 'Rate limit requests',
+						name: 'Set Value',
+						value: 'set',
+						description: 'Set string or JSON value of a key with optional TTL',
+						action: 'Set value of a key',
 					},
 				],
 				default: 'get',
@@ -230,7 +231,7 @@ export class UpstashRedis implements INodeType {
 						// Keep raw string if not JSON
 					}
 
-					returnData.push({ json: { key, value: parsedValue } });
+					returnData.push({ json: { key, value: parsedValue }, pairedItem: { item: i } });
 				} else if (operation === 'set') {
 					const key = this.getNodeParameter('key', i) as string;
 					const value = this.getNodeParameter('value', i) as string;
@@ -252,7 +253,7 @@ export class UpstashRedis implements INodeType {
 						},
 					);
 
-					returnData.push({ json: { success: response.result === 'OK', result: response.result } });
+					returnData.push({ json: { success: response.result === 'OK', result: response.result }, pairedItem: { item: i } });
 				} else if (operation === 'delete') {
 					const key = this.getNodeParameter('key', i) as string;
 					const response = await this.helpers.httpRequestWithAuthentication.call(
@@ -265,7 +266,7 @@ export class UpstashRedis implements INodeType {
 						},
 					);
 
-					returnData.push({ json: { deletedCount: response.result || 0 } });
+					returnData.push({ json: { deletedCount: response.result || 0 }, pairedItem: { item: i } });
 				} else if (operation === 'incr') {
 					const key = this.getNodeParameter('key', i) as string;
 					const amount = this.getNodeParameter('incrementAmount', i, 1) as number;
@@ -282,7 +283,7 @@ export class UpstashRedis implements INodeType {
 						},
 					);
 
-					returnData.push({ json: { key, newValue: response.result } });
+					returnData.push({ json: { key, newValue: response.result }, pairedItem: { item: i } });
 				} else if (operation === 'jsonGet') {
 					const key = this.getNodeParameter('key', i) as string;
 					const jsonPath = this.getNodeParameter('jsonPath', i, '$') as string;
@@ -303,7 +304,7 @@ export class UpstashRedis implements INodeType {
 						parsed = JSON.parse(response.result);
 					} catch (e) {}
 
-					returnData.push({ json: { key, jsonPath, data: parsed } });
+					returnData.push({ json: { key, jsonPath, data: parsed }, pairedItem: { item: i } });
 				} else if (operation === 'jsonSet') {
 					const key = this.getNodeParameter('key', i) as string;
 					const jsonPath = this.getNodeParameter('jsonPath', i, '$') as string;
@@ -322,7 +323,7 @@ export class UpstashRedis implements INodeType {
 						},
 					);
 
-					returnData.push({ json: { success: response.result === 'OK', result: response.result } });
+					returnData.push({ json: { success: response.result === 'OK', result: response.result }, pairedItem: { item: i } });
 				} else if (operation === 'rateLimit') {
 					const identifier = this.getNodeParameter('identifier', i) as string;
 					const maxRequests = this.getNodeParameter('maxRequests', i, 10) as number;
@@ -364,11 +365,12 @@ export class UpstashRedis implements INodeType {
 							windowSeconds,
 							currentCount: currentCount + 1,
 						},
+						pairedItem: { item: i },
 					});
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: (error as Error).message } });
+					returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
 					continue;
 				}
 				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });

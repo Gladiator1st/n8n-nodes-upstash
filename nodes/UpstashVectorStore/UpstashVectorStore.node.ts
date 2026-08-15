@@ -4,6 +4,7 @@ import type {
 	ISupplyDataFunctions,
 	SupplyData,
 } from 'n8n-workflow';
+import { NodeConnectionType } from 'n8n-workflow';
 
 interface UpstashVectorQueryResult {
 	id: string;
@@ -20,7 +21,9 @@ export class UpstashVectorStore implements INodeType {
 		icon: 'file:upstash.svg',
 		group: ['transform'],
 		version: 1,
+		subtitle: '={{$parameter["embeddingMode"]}}',
 		description: 'Serverless Vector Store for n8n AI Agents and RAG workflows with built-in auto-embeddings support',
+		usableAsTool: true,
 		defaults: {
 			name: 'Upstash Vector Store',
 		},
@@ -32,7 +35,7 @@ export class UpstashVectorStore implements INodeType {
 		],
 		inputs: `={{ [
 			{
-				type: "ai_embedding",
+				type: "${NodeConnectionType.AiEmbedding}",
 				name: "embedding",
 				displayName: "Embedding Model",
 				required: false,
@@ -41,7 +44,7 @@ export class UpstashVectorStore implements INodeType {
 		] }}`,
 		outputs: `={{ [
 			{
-				type: "ai_vectorStore",
+				type: "${NodeConnectionType.AiVectorStore}",
 				name: "vectorStore",
 				displayName: "Vector Store"
 			}
@@ -61,21 +64,21 @@ export class UpstashVectorStore implements INodeType {
 				type: 'options',
 				options: [
 					{
-						name: 'Upstash Built-in Embedding (Server-side)',
-						value: 'upstashAuto',
-						description: 'Uses Upstash auto-embedding configured in your Upstash index (No separate embedding key needed)',
-					},
-					{
 						name: 'External Embeddings Node',
 						value: 'externalNode',
 						description: 'Uses the connected n8n Embeddings model (e.g. OpenAI, Cohere)',
+					},
+					{
+						name: 'Upstash Built-in Embedding (Server-side)',
+						value: 'upstashAuto',
+						description: 'Uses Upstash auto-embedding configured in your Upstash index (No separate embedding key needed)',
 					},
 				],
 				default: 'upstashAuto',
 				description: 'Whether to use Upstash server-side embeddings or the connected n8n embeddings node',
 			},
 			{
-				displayName: 'Top K (Results Count)',
+				displayName: 'Top K',
 				name: 'topK',
 				type: 'number',
 				default: 4,
@@ -101,7 +104,7 @@ export class UpstashVectorStore implements INodeType {
 		const topK = this.getNodeParameter('topK', itemIndex, 4) as number;
 		const filter = this.getNodeParameter('filter', itemIndex, '') as string;
 
-		const embeddings = (await this.getInputConnectionData('ai_embedding' as any, 0)) as any;
+		const embeddings = (await this.getInputConnectionData(NodeConnectionType.AiEmbedding, 0)) as any;
 
 		const nodeContext = this;
 

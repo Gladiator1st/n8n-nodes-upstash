@@ -4,7 +4,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 export class UpstashVector implements INodeType {
 	description: INodeTypeDescription = {
@@ -15,11 +15,12 @@ export class UpstashVector implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Interact with Upstash Serverless Vector Database directly (Upsert, Query, Fetch, Delete)',
+		usableAsTool: true,
 		defaults: {
 			name: 'Upstash Vector',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
 				name: 'upstashVectorApi',
@@ -34,12 +35,12 @@ export class UpstashVector implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Vector',
-						value: 'vector',
-					},
-					{
 						name: 'Index',
 						value: 'index',
+					},
+					{
+						name: 'Vector',
+						value: 'vector',
 					},
 				],
 				default: 'vector',
@@ -56,16 +57,16 @@ export class UpstashVector implements INodeType {
 				},
 				options: [
 					{
-						name: 'Upsert Vector/Data',
+						name: 'Create or Update',
 						value: 'upsert',
-						description: 'Insert or update vectors or text data with metadata',
+						description: 'Create a new record, or update the current one if it already exists (upsert)',
 						action: 'Upsert vector or text data',
 					},
 					{
-						name: 'Query Similar',
-						value: 'query',
-						description: 'Search for nearest vectors or text embeddings',
-						action: 'Query nearest vectors',
+						name: 'Delete by ID',
+						value: 'delete',
+						description: 'Delete vectors by ID or prefix',
+						action: 'Delete vectors',
 					},
 					{
 						name: 'Fetch by ID',
@@ -74,10 +75,10 @@ export class UpstashVector implements INodeType {
 						action: 'Fetch vectors by ID',
 					},
 					{
-						name: 'Delete by ID',
-						value: 'delete',
-						description: 'Delete vectors by ID or prefix',
-						action: 'Delete vectors',
+						name: 'Query Similar',
+						value: 'query',
+						description: 'Search for nearest vectors or text embeddings',
+						action: 'Query nearest vectors',
 					},
 				],
 				default: 'query',
@@ -301,7 +302,7 @@ export class UpstashVector implements INodeType {
 
 			// Fields for Fetch & Delete
 			{
-				displayName: 'Vector IDs (Comma Separated)',
+				displayName: 'Vector IDs (Comma-Separated)',
 				name: 'vectorIds',
 				type: 'string',
 				default: '',
@@ -313,7 +314,7 @@ export class UpstashVector implements INodeType {
 						operation: ['fetch', 'delete'],
 					},
 				},
-				description: 'Comma separated list of vector IDs',
+				description: 'Comma-separated list of vector IDs',
 			},
 		],
 	};
@@ -373,7 +374,7 @@ export class UpstashVector implements INodeType {
 							},
 						);
 
-						returnData.push({ json: { success: true, result: response.result || response } });
+						returnData.push({ json: { success: true, result: response.result || response }, pairedItem: { item: i } });
 					} else if (operation === 'query') {
 						const queryType = this.getNodeParameter('queryType', i) as string;
 						const topK = this.getNodeParameter('topK', i, 5) as number;
@@ -412,7 +413,7 @@ export class UpstashVector implements INodeType {
 
 						const results = (response.result || response) as any[];
 						for (const res of results) {
-							returnData.push({ json: res });
+							returnData.push({ json: res, pairedItem: { item: i } });
 						}
 					} else if (operation === 'fetch') {
 						const vectorIdsRaw = this.getNodeParameter('vectorIds', i) as string;
@@ -433,7 +434,7 @@ export class UpstashVector implements INodeType {
 
 						const results = (response.result || response) as any[];
 						for (const res of results) {
-							returnData.push({ json: res });
+							returnData.push({ json: res, pairedItem: { item: i } });
 						}
 					} else if (operation === 'delete') {
 						const vectorIdsRaw = this.getNodeParameter('vectorIds', i) as string;
@@ -453,7 +454,7 @@ export class UpstashVector implements INodeType {
 							},
 						);
 
-						returnData.push({ json: { success: true, result: response.result || response } });
+						returnData.push({ json: { success: true, result: response.result || response }, pairedItem: { item: i } });
 					}
 				} else if (resource === 'index') {
 					if (operation === 'info') {
@@ -466,7 +467,7 @@ export class UpstashVector implements INodeType {
 								json: true,
 							},
 						);
-						returnData.push({ json: response.result || response });
+						returnData.push({ json: response.result || response, pairedItem: { item: i } });
 					} else if (operation === 'reset') {
 						let endpoint = `${baseUrl}/reset`;
 						if (namespace) endpoint += `?namespace=${encodeURIComponent(namespace)}`;
@@ -480,12 +481,12 @@ export class UpstashVector implements INodeType {
 								json: true,
 							},
 						);
-						returnData.push({ json: { success: true, result: response.result || response } });
+						returnData.push({ json: { success: true, result: response.result || response }, pairedItem: { item: i } });
 					}
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: (error as Error).message } });
+					returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
 					continue;
 				}
 				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });

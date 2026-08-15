@@ -4,7 +4,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 export class UpstashQStash implements INodeType {
 	description: INodeTypeDescription = {
@@ -15,11 +15,12 @@ export class UpstashQStash implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
 		description: 'Serverless HTTP Message Queue, Delayed Webhook Scheduler & Cron Runner',
+		usableAsTool: true,
 		defaults: {
 			name: 'Upstash QStash',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionType.Main],
 		credentials: [
 			{
 				name: 'upstashQStashApi',
@@ -34,10 +35,10 @@ export class UpstashQStash implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Publish Message (With Delay/Queue)',
-						value: 'publish',
-						description: 'Publish an HTTP message to a destination URL with optional delay',
-						action: 'Publish message',
+						name: 'Cancel Message',
+						value: 'cancelMessage',
+						description: 'Cancel a pending delayed message before it executes',
+						action: 'Cancel message',
 					},
 					{
 						name: 'Create Cron Schedule',
@@ -46,22 +47,22 @@ export class UpstashQStash implements INodeType {
 						action: 'Create cron schedule',
 					},
 					{
-						name: 'List Schedules',
-						value: 'listSchedules',
-						description: 'List all active QStash cron schedules',
-						action: 'List schedules',
-					},
-					{
 						name: 'Delete Schedule',
 						value: 'deleteSchedule',
 						description: 'Delete an active cron schedule by Schedule ID',
 						action: 'Delete schedule',
 					},
 					{
-						name: 'Cancel Message',
-						value: 'cancelMessage',
-						description: 'Cancel a pending delayed message before it executes',
-						action: 'Cancel message',
+						name: 'List Schedules',
+						value: 'listSchedules',
+						description: 'List all active QStash cron schedules',
+						action: 'List schedules',
+					},
+					{
+						name: 'Publish Message (With Delay/Queue)',
+						value: 'publish',
+						description: 'Publish an HTTP message to a destination URL with optional delay',
+						action: 'Publish message',
 					},
 				],
 				default: 'publish',
@@ -218,7 +219,7 @@ export class UpstashQStash implements INodeType {
 						},
 					);
 
-					returnData.push({ json: response });
+					returnData.push({ json: response, pairedItem: { item: i } });
 				} else if (operation === 'createSchedule') {
 					const destinationUrl = this.getNodeParameter('destinationUrl', i) as string;
 					const cron = this.getNodeParameter('cron', i) as string;
@@ -243,7 +244,7 @@ export class UpstashQStash implements INodeType {
 						},
 					);
 
-					returnData.push({ json: response });
+					returnData.push({ json: response, pairedItem: { item: i } });
 				} else if (operation === 'listSchedules') {
 					const response = await this.helpers.httpRequestWithAuthentication.call(
 						this,
@@ -257,7 +258,7 @@ export class UpstashQStash implements INodeType {
 
 					const list = Array.isArray(response) ? response : [response];
 					for (const item of list) {
-						returnData.push({ json: item });
+						returnData.push({ json: item, pairedItem: { item: i } });
 					}
 				} else if (operation === 'deleteSchedule') {
 					const scheduleId = this.getNodeParameter('scheduleId', i) as string;
@@ -271,7 +272,7 @@ export class UpstashQStash implements INodeType {
 						},
 					);
 
-					returnData.push({ json: { success: true, scheduleId, result: response } });
+					returnData.push({ json: { success: true, scheduleId, result: response }, pairedItem: { item: i } });
 				} else if (operation === 'cancelMessage') {
 					const messageId = this.getNodeParameter('messageId', i) as string;
 					const response = await this.helpers.httpRequestWithAuthentication.call(
@@ -284,11 +285,11 @@ export class UpstashQStash implements INodeType {
 						},
 					);
 
-					returnData.push({ json: { success: true, messageId, result: response } });
+					returnData.push({ json: { success: true, messageId, result: response }, pairedItem: { item: i } });
 				}
 			} catch (error) {
 				if (this.continueOnFail()) {
-					returnData.push({ json: { error: (error as Error).message } });
+					returnData.push({ json: { error: (error as Error).message }, pairedItem: { item: i } });
 					continue;
 				}
 				throw new NodeOperationError(this.getNode(), error as Error, { itemIndex: i });
