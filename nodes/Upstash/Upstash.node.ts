@@ -58,17 +58,17 @@ export class Upstash implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
-						name: 'Vector',
+						name: 'Vector Database',
 						value: 'vector',
 						description: 'Serverless Vector database for embeddings, semantic similarity search, and RAG',
 					},
 					{
-						name: 'Redis',
+						name: 'Redis Database',
 						value: 'redis',
 						description: 'Serverless Redis Key-Value caching, JSON operations, and AI rate limiting',
 					},
 					{
-						name: 'QStash',
+						name: 'QStash Queue',
 						value: 'qstash',
 						description: 'Serverless HTTP message queue, delayed webhooks, and cron scheduler',
 					},
@@ -93,7 +93,7 @@ export class Upstash implements INodeType {
 					{
 						name: 'Create or Update',
 						value: 'upsert',
-						description: 'Create a new vector record, or update it if it already exists (auto-embeds text)',
+						description: 'Create a new record, or update the current one if it already exists (upsert)',
 						action: 'Upsert vector or text data',
 					},
 					{
