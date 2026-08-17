@@ -1,6 +1,6 @@
 {
   "name": "@gladiator1st/n8n-nodes-upstash",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "n8n community node suite for Upstash Serverless Vector (RAG), Redis Caching & QStash Scheduler",
   "author": {
     "name": "Muhammad Qasim",
@@ -42,10 +42,8 @@
       "dist/credentials/UpstashQStashApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/UpstashVectorStore/UpstashVectorStore.node.js",
-      "dist/nodes/UpstashVector/UpstashVector.node.js",
-      "dist/nodes/UpstashRedis/UpstashRedis.node.js",
-      "dist/nodes/UpstashQStash/UpstashQStash.node.js"
+      "dist/nodes/Upstash/Upstash.node.js",
+      "dist/nodes/UpstashVectorStore/UpstashVectorStore.node.js"
     ]
   },
   "devDependencies": {

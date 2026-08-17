@@ -23,7 +23,7 @@
       },
       "id": "upstash-vector-upsert",
       "name": "1. Upstash Vector - Upsert Knowledge",
-      "type": "@gladiator1st/n8n-nodes-upstash.upstashVector",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstash",
       "typeVersion": 1,
       "position": [
         450,
@@ -41,7 +41,7 @@
       },
       "id": "upstash-vector-query",
       "name": "2. Upstash Vector - Semantic Similarity Query",
-      "type": "@gladiator1st/n8n-nodes-upstash.upstashVector",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstash",
       "typeVersion": 1,
       "position": [
         700,
@@ -50,6 +50,7 @@
     },
     {
       "parameters": {
+        "resource": "redis",
         "operation": "set",
         "key": "user_session:1001",
         "value": "{\"name\": \"Qasim\", \"role\": \"SuperAdmin\", \"status\": \"active\"}",
@@ -57,7 +58,7 @@
       },
       "id": "upstash-redis-set",
       "name": "3. Upstash Redis - Set Key & TTL",
-      "type": "@gladiator1st/n8n-nodes-upstash.upstashRedis",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstash",
       "typeVersion": 1,
       "position": [
         450,
@@ -66,12 +67,13 @@
     },
     {
       "parameters": {
+        "resource": "redis",
         "operation": "get",
         "key": "user_session:1001"
       },
       "id": "upstash-redis-get",
       "name": "4. Upstash Redis - Get Key",
-      "type": "@gladiator1st/n8n-nodes-upstash.upstashRedis",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstash",
       "typeVersion": 1,
       "position": [
         700,
@@ -80,6 +82,7 @@
     },
     {
       "parameters": {
+        "resource": "redis",
         "operation": "rateLimit",
         "identifier": "user_qasim_123",
         "maxRequests": 5,
@@ -87,7 +90,7 @@
       },
       "id": "upstash-redis-ratelimit",
       "name": "5. Upstash Redis - AI Rate Limiter",
-      "type": "@gladiator1st/n8n-nodes-upstash.upstashRedis",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstash",
       "typeVersion": 1,
       "position": [
         950,
@@ -96,6 +99,7 @@
     },
     {
       "parameters": {
+        "resource": "qstash",
         "operation": "publish",
         "destinationUrl": "https://webhook.site/test-callback",
         "body": "{\n  \"message\": \"Triggering delayed notification from n8n!\",\n  \"timestamp\": 1700000000\n}",
@@ -104,7 +108,7 @@
       },
       "id": "upstash-qstash-publish",
       "name": "6. Upstash QStash - Delayed Webhook (10s)",
-      "type": "@gladiator1st/n8n-nodes-upstash.upstashQStash",
+      "type": "@gladiator1st/n8n-nodes-upstash.upstash",
       "typeVersion": 1,
       "position": [
         450,
