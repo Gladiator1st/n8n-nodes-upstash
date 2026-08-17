@@ -30,8 +30,18 @@ jobs:
       - name: Build TypeScript & Assets
         run: npm run build
 
-      - name: Authenticate and Publish with Provenance
+      - name: Authenticate and Publish with Provenance (if new version)
         run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          NPM_VERSION=$(npm view @gladiator1st/n8n-nodes-upstash version 2>/dev/null || echo "")
+          echo "Current package version: $CURRENT_VERSION"
+          echo "Latest version on npm:   $NPM_VERSION"
+
+          if [ "$CURRENT_VERSION" = "$NPM_VERSION" ]; then
+            echo "✅ Version $CURRENT_VERSION is already published on npm. Skipping publish."
+            exit 0
+          fi
+
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
           npm publish --provenance --access public
         env:

@@ -23,7 +23,7 @@
   "homepage": "https://github.com/Gladiator1st/n8n-nodes-upstash#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Gladiator1st/n8n-nodes-upstash.git"
+    "url": "git+https://github.com/Gladiator1st/n8n-nodes-upstash.git"
   },
   "main": "index.js",
   "scripts": {
