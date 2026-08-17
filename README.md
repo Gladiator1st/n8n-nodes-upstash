@@ -1,7 +1,9 @@
 # @gladiator1st/n8n-nodes-upstash
 
 ![n8n Community Node](https://img.shields.io/badge/n8n-community--node-orange?style=flat-square)
-![npm version](https://img.shields.io/npm/v/@gladiator1st/n8n-nodes-upstash?style=flat-square&color=00e599)
+[![npm version](https://img.shields.io/npm/v/@gladiator1st/n8n-nodes-upstash?style=flat-square&color=00e599)](https://www.npmjs.com/package/@gladiator1st/n8n-nodes-upstash)
+[![npm weekly downloads](https://img.shields.io/npm/dw/@gladiator1st/n8n-nodes-upstash?style=flat-square&color=blue&logo=npm)](https://www.npmjs.com/package/@gladiator1st/n8n-nodes-upstash)
+[![npm total downloads](https://img.shields.io/npm/dt/@gladiator1st/n8n-nodes-upstash?style=flat-square&color=purple&logo=npm)](https://www.npmjs.com/package/@gladiator1st/n8n-nodes-upstash)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
 An all-in-one **n8n Community Node Suite** for **Upstash Serverless Data & AI** — providing native **Vector Search (RAG) for AI Agents**, **Redis Caching & AI Rate-Limiting**, and **QStash Delayed Webhook Scheduling**.
